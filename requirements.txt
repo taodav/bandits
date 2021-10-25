@@ -1,0 +1,6 @@
+numpy
+jax[cpu]
+typed-argument-parser
+jupyter
+tqdm
+-e .
