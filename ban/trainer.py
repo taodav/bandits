@@ -18,13 +18,12 @@ class Trainer:
         self.total_eps = args.total_eps
 
         self.args = args
-        self.info = {'regret': [], 'cum_regret': []}
+        self.info = {'regret': np.zeros(self.total_eps, dtype=np.float32)}
         self.log_freq = args.log_freq
 
     def _print_stats(self, t: int):
         print(f"Episode: {t}, \t"
-              f"regret over past {self.log_freq} eps: {sum(self.info['regret'][-self.log_freq:]):.4f}, \t"
-              f"most recent cumulative regret: {self.info['cum_regret'][-1]:.4f}")
+              f"regret over past {self.log_freq} eps: {sum(self.info['regret'][max(t - self.log_freq, 0):t + 1]):.4f}")
 
     @staticmethod
     @jit
@@ -33,17 +32,14 @@ class Trainer:
         return regret
 
     def train(self):
-        cum_regret = 0
 
         for t in range(1, self.total_eps + 1):
             x_t = self.agent.act(t)
 
             r_t = self.bandit.pull(x_t)
             regret = self.calc_regret(1, self.agent.theta, x_t)
-            cum_regret += regret
 
-            self.info['cum_regret'].append(cum_regret)
-            self.info['regret'].append(regret)
+            self.info['regret'][t - 1] = regret
 
             self.agent.update(x_t, r_t)
 
@@ -51,7 +47,7 @@ class Trainer:
                 self._print_stats(t)
 
     def get_info(self):
-        return_info = {}
+        return_info = {'args': self.args.as_dict()}
         for k, v in self.info.items():
             return_info[k] = np.array(self.info[k])
 

@@ -1,5 +1,6 @@
 numpy
 jax[cpu]
+matplotlib
 typed-argument-parser
 jupyter
 tqdm

@@ -1,6 +1,5 @@
 import numpy as np
 import jax.numpy as jnp
-from functools import partial
 from jax import jit, random
 from typing import Any
 
